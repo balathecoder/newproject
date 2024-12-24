@@ -28,3 +28,28 @@ Groups - Groups to categorize users according to their job roles. The policies a
 Roles - Roles are entities that grant access to AWS services and resources by providing temporary credentials. For example, application (from outside of AWS) that runs on private cloud or on premise needs to access DB service that runs on AWS to access customer data, then the application can use roles to access DB service. Here, roles will have temporary credentials. Roles are similar to user but not as 100% like users.
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_roles_usecase.JPG)
 
+Creating simple user dev-user-101, no attaching to groups/policies.
+
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_simple_user_creation.JPG)
+
+you will be able to download the csv file with contents as,
+```
+User name	Password	Console sign-in URL
+dev-user-101	test@1234	https://381491823509.signin.aws.amazon.com/console
+```
+in above, 381491823509 is the account id. Login with account id, user name and password.
+
+attempted to create bucket from dev-user-101 account and no permission,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_s3_bucket_creation_failed.JPG)
+
+adding permission from devops user or root user for dev-user-101 account.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_add_permission.JPG)
+
+In AWS, there is AWS managed permission and customized permission or policies. Now after provide S3FullAccess we are able to see s3 buckets.
+
+Create groups, attach policy/permission to the group. Use only IAM user even for DevOps or admin user, dont use root user. IN below example, create testers-group with s3fullaccess policy,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_group_with_s3access.JPG)
+
+Now adding test-user-501 to testers-group,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_group_with_testuser.JPG)
+
