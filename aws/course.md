@@ -69,7 +69,29 @@ You will be able to connect to EC2 instance via Putty or Moba xterm with the Pub
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_connect_to_EC2_instance.JPG)
 
 I was unable to connect, so as part of troubleshooting found that EC2 didnt have public subnet so recreated VPC with private & public subnets. And then assigned this public subnet to my EC2,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_EC2_with_public_subnet.JPG)
+
+Also i disconnected my office VPN and then tried ssh from git bash as, 
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_ssh_EC2_instance.JPG)
+
+```
+$ chmod 600 aws-login-key.pem
+$ ssh -i aws-login-key.pem ubuntu@34.239.187.60
+```
+
+From EC2 instance,
+```
+$ sudo su -
+# sudo apt update
+# sudo apt install fontconfig openjdk-17-jre
+# sudo apt install jenkins
+# systemctl status jenkins
+```
 
 Install Jenkins applications, edit security group to allow incoming port traffic to 8080.
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_EC2_with_public_subnet.JPG)
+
+Now enable port 8080 with security group,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_inbound_port_8080.JPG)
+
+Open jenkins web page with public ip http://34.239.187.60:8080
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_jenkins_webpage.JPG)
