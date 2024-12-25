@@ -48,8 +48,22 @@ adding permission from devops user or root user for dev-user-101 account.
 In AWS, there is AWS managed permission and customized permission or policies. Now after provide S3FullAccess we are able to see s3 buckets.
 
 Create groups, attach policy/permission to the group. Use only IAM user even for DevOps or admin user, dont use root user. IN below example, create testers-group with s3fullaccess policy,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_group_with_s3access.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_s3access.JPG)
 
 Now adding test-user-501 to testers-group,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_group_with_testuser.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_testuser.JPG)
 
+## Day 3
+
+### EC2 - Elastic Cloud Compute
+EC2 provides businesses with the ability to run applications and workloads in the AWS public cloud.
+AWS has regions and each region has Availability zones.
+Availability zone: Enable you to operate production application that are more highly available, fault tolerant, and scalable than possible when using a single data centre.
+Regions : Regions are collection of zones. Zones have high band width, low latency network connections to other zones in the same region. 
+If the customer from US wants to access application, then have EC2 instance running in regions in US to serve response with less delay and that is a low latency. If EC2 instance created in Mumbai region, then there are chances that delay will be there which is a high latency.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_regions.JPG)
+
+The default storage is 8GB which is enough for application to run.
+
+You will be able to connect to EC2 instance via Putty or Moba xterm with the Public IP address of EC2 instance,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_connect_to_EC2_instance.JPG)
