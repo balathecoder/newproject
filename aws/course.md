@@ -117,3 +117,4 @@ NACL within subnet if you want to repeat security group concept to multiple EC2 
 
 NAT - Let say application wants to download something from internet. If my application is xyz server, and needs to download a package from internet, then the external world should not know IP address of my xyz server, in that case IP address has to be masked. Masking of IP address is called as NAT gateway. This basically helps to download resource from Internet along with that it masks IP address of application.
 
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_why_VPC_with_example.JPG)
