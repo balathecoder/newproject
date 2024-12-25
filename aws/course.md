@@ -95,3 +95,25 @@ Now enable port 8080 with security group,
 
 Open jenkins web page with public ip http://34.239.187.60:8080
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_jenkins_webpage.JPG)
+
+## Day 4
+
+### VPC
+Virtual Private Cloud is a virtual network that allows you to launch AWS resources in a logically isolated section of the AWS cloud.
+
+VPC for a company and subnet for projects within a company.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_VPC_and_Subnets.JPG)
+
+Inside a VPC, there are public subnets and private subnets. Entire IP address is allocated to VPC. 172.16.0.0/16
+Each subnet can have EC2 instances depends on the project requirements. IP address range gets sub divided for each subnet. 172.16.1.0/24
+Public subnet is the one that a user access inside a VPC. 
+Public subnet connects to the Internet using Internet Gateway. 
+Through the public subnet, the user enters into the VPC.
+Load Balancer that forwards requests to application.
+Route table using which User from Internet reaches application from Load Balancer. This defines how the request goes to the application.
+Once reaches Ec2 instance, still something can block request which is Security group. Once it allows request to port number, then the request can reach to application.
+NACL within subnet if you want to repeat security group concept to multiple EC2 instances, then NACLs can be used. This is basically automation for security group.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_VPC_concepts.JPG)
+
+NAT - Let say application wants to download something from internet. If my application is xyz server, and needs to download a package from internet, then the external world should not know IP address of my xyz server, in that case IP address has to be masked. Masking of IP address is called as NAT gateway. This basically helps to download resource from Internet along with that it masks IP address of application.
+
