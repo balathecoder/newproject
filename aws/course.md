@@ -47,8 +47,8 @@ adding permission from devops user or root user for dev-user-101 account.
 
 In AWS, there is AWS managed permission and customized permission or policies. Now after provide S3FullAccess we are able to see s3 buckets.
 
-Create groups, attach policy/permission to the group. Use only IAM user even for DevOps or admin user, dont use root user. IN below example, create testers-group with s3fullaccess policy,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_s3access.JPG)
+Create groups, attach policy/permission to the group. Use only IAM user even for DevOps or admin user, dont use root user. In below example, create testers-group with s3fullaccess policy,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_s3a_ccess.JPG)
 
 Now adding test-user-501 to testers-group,
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_testuser.JPG)
@@ -56,19 +56,21 @@ Now adding test-user-501 to testers-group,
 ## Day 3
 
 ### EC2 - Elastic Cloud Compute
-EC2 provides businesses with the ability to run applications and workloads in the AWS public cloud.
+* EC2 provides businesses with the ability to run applications and workloads in the AWS public cloud.
 AWS has regions and each region has Availability zones.
-Availability zone: Enable you to operate production application that are more highly available, fault tolerant, and scalable than possible when using a single data centre.
-Regions : Regions are collection of zones. Zones have high band width, low latency network connections to other zones in the same region. 
-If the customer from US wants to access application, then have EC2 instance running in regions in US to serve response with less delay and that is a low latency. If EC2 instance created in Mumbai region, then there are chances that delay will be there which is a high latency.
+* Availability zone: Enable you to operate production application that are more highly available, fault tolerant, and scalable than possible when using a single data centre.
+* Regions : Regions are collection of zones. Zones have high band width, low latency network connections to other zones in the same region. 
+* If the customer from US wants to access application, then have EC2 instance running in regions in US to serve response with less delay and that is a low latency. If EC2 instance created in Mumbai region, then there are chances that delay will be there which is a high latency.
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_regions.JPG)
 
 The default storage is 8GB which is enough for application to run.
 
 You will be able to connect to EC2 instance via Putty or Moba xterm with the Public IP address of EC2 instance,
+
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_connect_to_EC2_instance.JPG)
 
 I was unable to connect, so as part of troubleshooting found that EC2 didnt have public subnet so recreated VPC with private & public subnets. And then assigned this public subnet to my EC2,
+
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day3_EC2_with_public_subnet.JPG)
 
 Also i disconnected my office VPN and then tried ssh from git bash as, 
@@ -104,15 +106,15 @@ Virtual Private Cloud is a virtual network that allows you to launch AWS resourc
 VPC for a company and subnet for projects within a company.
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_VPC_and_Subnets.JPG)
 
-Inside a VPC, there are public subnets and private subnets. Entire IP address is allocated to VPC. 172.16.0.0/16
+* Inside a VPC, there are public subnets and private subnets. Entire IP address is allocated to VPC. 172.16.0.0/16
 Each subnet can have EC2 instances depends on the project requirements. IP address range gets sub divided for each subnet. 172.16.1.0/24
-Public subnet is the one that a user access inside a VPC. 
-Public subnet connects to the Internet using Internet Gateway. 
-Through the public subnet, the user enters into the VPC.
-Load Balancer that forwards requests to application.
-Route table using which User from Internet reaches application from Load Balancer. This defines how the request goes to the application.
-Once reaches Ec2 instance, still something can block request which is Security group. Once it allows request to port number, then the request can reach to application.
-NACL within subnet if you want to repeat security group concept to multiple EC2 instances, then NACLs can be used. This is basically automation for security group.
+* Public subnet is the one that a user access inside a VPC. 
+* Public subnet connects to the Internet using Internet Gateway. 
+* Through the public subnet, the user enters into the VPC.
+* Load Balancer that forwards requests to application.
+* Route table using which User from Internet reaches application from Load Balancer. This defines how the request goes to the application.
+* Once reaches Ec2 instance, still something can block request which is Security group. Once it allows request to port number, then the request can reach to application.
+* NACL within subnet if you want to repeat security group concept to multiple EC2 instances, then NACLs can be used. This is basically automation for security group.
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_VPC_concepts.JPG)
 
 NAT - Let say application wants to download something from internet. If my application is xyz server, and needs to download a package from internet, then the external world should not know IP address of my xyz server, in that case IP address has to be masked. Masking of IP address is called as NAT gateway. This basically helps to download resource from Internet along with that it masks IP address of application.
