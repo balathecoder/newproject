@@ -48,7 +48,7 @@ adding permission from devops user or root user for dev-user-101 account.
 In AWS, there is AWS managed permission and customized permission or policies. Now after provide S3FullAccess we are able to see s3 buckets.
 
 Create groups, attach policy/permission to the group. Use only IAM user even for DevOps or admin user, dont use root user. In below example, create testers-group with s3fullaccess policy,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_s3a_ccess.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_s3_access.JPG)
 
 Now adding test-user-501 to testers-group,
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day2_test_group_with_testuser.JPG)
