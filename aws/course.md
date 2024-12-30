@@ -106,10 +106,13 @@ Virtual Private Cloud is a virtual network that allows you to launch AWS resourc
 VPC for a company and subnet for projects within a company.
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_VPC_and_Subnets.JPG)
 
-* Inside a VPC, there are public subnets and private subnets. Entire IP address is allocated to VPC. 172.16.0.0/16
-Each subnet can have EC2 instances depends on the project requirements. IP address range gets sub divided for each subnet. 172.16.1.0/24
-* Public subnet is the one that a user access inside a VPC. 
-* Public subnet connects to the Internet using Internet Gateway. 
+* ![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_VPC_concepts2.JPG)
+* Inside a VPC, there are public subnets and private subnets. Entire IP address is allocated to VPC. 172.16.0.0/16 for 65536 IP addresses where 16 represents allocates first 16bits for network ip(172.16) and remaining 16bit for host ip.
+Each subnet can have EC2 instances depends on the project requirements. IP address range gets sub divided for each subnet. 172.16.1.0/24 for 256 IP addresses wherein first 24 bits for network ip and remaining 8bit for host ip. Subnets are smaller range of IP addresses. Within VPC any resource from a subnet can communicate with other resources from other subnets within VPC.
+* Public subnet is the one that a user access inside a VPC. Load balancers will be on Public subnets.
+* Public subnet connects to the Internet using Internet Gateway.
+* Private subnets where all application resources resides. This doesnt have access to outside world.
+* To connect to resources outside of VPC, use S3 Gateway to connect to S3 buckets.
 * Through the public subnet, the user enters into the VPC.
 * Load Balancer that forwards requests to application.
 * Route table using which User from Internet reaches application from Load Balancer. This defines how the request goes to the application.
@@ -120,3 +123,35 @@ Each subnet can have EC2 instances depends on the project requirements. IP addre
 NAT - Let say application wants to download something from internet. If my application is xyz server, and needs to download a package from internet, then the external world should not know IP address of my xyz server, in that case IP address has to be masked. Masking of IP address is called as NAT gateway. This basically helps to download resource from Internet along with that it masks IP address of application.
 
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day4_why_VPC_with_example.JPG)
+
+## Day 5
+
+### Security Group and NACL
+Security Group and NACL are both tools for controlling access to AWS resources within a VPC. The main difference between two is that Security group control access at instance level, while NACL control access at the subnet level.
+
+NACL helps to define access level at organization level. So if deny access list is defined in subnet level with NACL, the same port/ip cant be allowed in Security group level. Similarly, if you want to allow port 50 for all EC2 instance in a subnet, then you can do that in NACL.
+
+In AWS, security is a shared responsibility. 
+
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day5_SG_and_NACL.JPG)
+
+Let say in a subnet, if there are 10000 EC2 instances, then you can apply allow/deny rules at NACL only once which helps you in saving time of applying time for all 10000 EC2 instances. Remember that, SG has only allow rules.
+
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day5_SG_and_NACL2.JPG)
+
+When you do VPC creation, the below components gets created. It should have public subnet for the resources within VPC to connect to Internet.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day5_VPC_creation.JPG)
+
+Exercise :
+* Create VPC with default private and public subnets - my-vpc-01
+* Create EC2 instance which uses my-vpc-01 VPC and uses a public subnet with Public IP enabled.
+* Now run a application on the EC2 instance,
+```
+$ python3 -m http.server 8000
+```
+* Try to access this web application from browser with http://<pubic_ip>:8000
+* You wont be able access, try to provide access in both ways,
+- via Security Group,
+- via Network ACLs for the public subnet and allow port 8000 for ec2 instance within publich subnet.
+
+## Day 6
