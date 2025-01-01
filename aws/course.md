@@ -155,3 +155,6 @@ $ python3 -m http.server 8000
 - via Network ACLs for the public subnet and allow port 8000 for ec2 instance within publich subnet.
 
 ## Day 6
+
+### Route53
+Route53 provides DNS as a service as similar like EC2 for Compute service, EKS for Kubernetes as a service. 
