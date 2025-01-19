@@ -1,4 +1,4 @@
-# AWS
+![image](https://github.com/user-attachments/assets/959baf77-742a-46fb-b7bc-87d0adf9807b)# AWS
 
 ## Day 1
 
@@ -196,6 +196,7 @@ give name for auto scaling group, AMI image, instance type,  key pair, security 
 and in the next no need to create load balancer in 
  ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_capacity.JPG)
 
+### Step 3 : Create bastian or jump host to login to EC2 instances with private IP,
  Now the EC2 instance is created and it does not have public IP address.  So we need to create bastian or jump host
 
  create it as shown below as like normal EC2 instance with configuration such as choose the VPC that we created, enable elastic IP address, choose subnet as public subnet, image ubuntu, instance type as micro, 
@@ -208,3 +209,48 @@ Now we need to copy the key pair to bastian host and using that we can login to 
 
 Now login to bastian host with public ip via ssh, then give 400 permission for key pair file and then login to other EC2 instance with private ip, 
 ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_login_to_ec2.JPG)
+
+copy some simple html file and get it running as below,
+```
+$ cat >index.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>HTML Tutorial</title>
+</head>
+<body>
+
+<h1>This is a heading</h1>
+<p>This is my first project in AWS</p>
+
+</body>
+</html> 
+```
+```
+$ python3 -m http.server 8000
+```
+### Step 4 : Create Load Balancer
+create the load balancer,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_load_balancer.JPG)
+Choose both availability zone with public subnet,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_load_balancer_both_availability_zone.JPG)
+choose the security group which is created or create new one - to say what kind of traffic are we allowing, aws-prod-example allows ssh(22) and port 8000 traffic.
+
+create target group for "listeners and routing" to say for HTTP port 80 which EC2 instance we want to access,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_target_group.JPG)
+in the next page of target group, select both EC2 instances,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_target_group_ec2_instance.JPG)
+
+Continue with load balancer creation, choose this newly created target group,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_choose_target_group.JPG)
+and LB is created,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_created.JPG)
+make sure the Load Balancer security group allows port 80.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_sg_port.JPG)
+
+copy the hostname from load balancer and try to access it via browser,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_hostname.JPG)
+
+Finally the home page is visible
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_web_page.JPG)
+
