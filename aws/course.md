@@ -157,4 +157,54 @@ $ python3 -m http.server 8000
 ## Day 6
 
 ### Route53
-Route53 provides DNS as a service as similar like EC2 for Compute service, EKS for Kubernetes as a service. 
+Route53 provides DNS as a service as similar like EC2 for Compute service, EKS for Kubernetes as a service. Using Route53 we can do domain registration, we can update DNS records using hosted zones. It also performs health checks.
+
+The URL request comes via Internet Gateway and once it reaches route53, it routes it to the appropriate LoadBalancer.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day6_route53.JPG)
+
+Once your are done with your application, then very first thing that you need to do is domain registration. Domain registration can happens with AWS as AWS also sells domain name or outside also we can buy the domain name i.e:GoDaddy or etc
+
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day6_route53_setup.JPG)
+
+Documentation :https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html
+## Day 7
+Project,
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_project.JPG)
+
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_project_desc.JPG)
+
+https://docs.aws.amazon.com/vpc/latest/userguide/vpc-example-private-subnets-nat.html
+
+### Step 1: VPC creation
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_VPC_creation.JPG)
+As shown above, when you create VPC there are 2 public subnets and 2 private subnets getting created. route table route the traffic to the internet gateway. If no route table, nothing happens in subnet. so public subnet should have route table with internet gateway attached so that outside traffic flows into the subnet.
+
+Elastic IP is called as Static IP address and it never changes. If your instance does not have a public IP address, you can associate an Elastic IP address with your instance to enable communication with the internet.
+ ### Step 2 : Auto scaling group creation
+ In this project we are using auto scaling group to create EC2 instances.
+ 
+ An Amazon EC2 Auto Scaling Group(ASG) contains a collection of EC2 instances that share similar characteristics and are treated as a logical grouping for the purposes of fleet management and dynamic scaling.
+ 
+ Auto scaling group in AWS cant be created directly, we can use launch template. First create launch template as shown below,
+give name for auto scaling group, AMI image, instance type,  key pair, security group with allow rule for ssh port,  
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_group_inputs.JPG)
+
+ Now create auto scaling group,
+ ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_group_creation.JPG)
+ while choosing network, choose VPC that we have created and choose availablity zones and subnets as "us-east1a-private-subnet" & "us-east1b-private-subnet"
+ ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_choose_network.JPG)
+and in the next no need to create load balancer in 
+ ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_capacity.JPG)
+
+ Now the EC2 instance is created and it does not have public IP address.  So we need to create bastian or jump host
+
+ create it as shown below as like normal EC2 instance with configuration such as choose the VPC that we created, enable elastic IP address, choose subnet as public subnet, image ubuntu, instance type as micro, 
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_bastian_host.JPG)
+
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_bastian_host_created.JPG)
+
+Now we need to copy the key pair to bastian host and using that we can login to EC2 instance from bastian host.
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_copy_key_to_bastian_host.JPG)
+
+Now login to bastian host with public ip via ssh, then give 400 permission for key pair file and then login to other EC2 instance with private ip, 
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_login_to_ec2.JPG)
