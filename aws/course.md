@@ -169,14 +169,14 @@ Once your are done with your application, then very first thing that you need to
 Documentation :https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html
 ## Day 7
 Project,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_project.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_project.png)
 
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_project_desc.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_project_desc.png)
 
 https://docs.aws.amazon.com/vpc/latest/userguide/vpc-example-private-subnets-nat.html
 
 ### Step 1: VPC creation
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_VPC_creation.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_VPC_creation.png)
 As shown above, when you create VPC there are 2 public subnets and 2 private subnets getting created. route table route the traffic to the internet gateway. If no route table, nothing happens in subnet. so public subnet should have route table with internet gateway attached so that outside traffic flows into the subnet.
 
 Elastic IP is called as Static IP address and it never changes. If your instance does not have a public IP address, you can associate an Elastic IP address with your instance to enable communication with the internet.
@@ -187,28 +187,28 @@ Elastic IP is called as Static IP address and it never changes. If your instance
  
  Auto scaling group in AWS cant be created directly, we can use launch template. First create launch template as shown below,
 give name for auto scaling group, AMI image, instance type,  key pair, security group with allow rule for ssh port,  
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_group_inputs.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_group_inputs.png)
 
  Now create auto scaling group,
- ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_group_creation.JPG)
+ ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_group_creation.png)
  while choosing network, choose VPC that we have created and choose availablity zones and subnets as "us-east1a-private-subnet" & "us-east1b-private-subnet"
- ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_choose_network.JPG)
+ ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_choose_network.png)
 and in the next no need to create load balancer in 
- ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_capacity.JPG)
+ ![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_autoscaling_capacity.png)
 
 ### Step 3 : Create bastian or jump host to login to EC2 instances with private IP,
  Now the EC2 instance is created and it does not have public IP address.  So we need to create bastian or jump host
 
  create it as shown below as like normal EC2 instance with configuration such as choose the VPC that we created, enable elastic IP address, choose subnet as public subnet, image ubuntu, instance type as micro, 
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_bastian_host.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_bastian_host.png)
 
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_bastian_host_created.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_bastian_host_created.png)
 
 Now we need to copy the key pair to bastian host and using that we can login to EC2 instance from bastian host.
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_copy_key_to_bastian_host.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_copy_key_to_bastian_host.png)
 
 Now login to bastian host with public ip via ssh, then give 400 permission for key pair file and then login to other EC2 instance with private ip, 
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_login_to_ec2.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_login_to_ec2.png)
 
 copy some simple html file and get it running as below,
 ```
@@ -231,26 +231,35 @@ $ python3 -m http.server 8000
 ```
 ### Step 4 : Create Load Balancer
 create the load balancer,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_load_balancer.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_load_balancer.png)
 Choose both availability zone with public subnet,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_load_balancer_both_availability_zone.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_load_balancer_both_availability_zone.png)
 choose the security group which is created or create new one - to say what kind of traffic are we allowing, aws-prod-example allows ssh(22) and port 8000 traffic.
 
 create target group for "listeners and routing" to say for HTTP port 80 which EC2 instance we want to access,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_target_group.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_target_group.png)
 in the next page of target group, select both EC2 instances,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_target_group_ec2_instance.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_target_group_ec2_instance.png)
 
 Continue with load balancer creation, choose this newly created target group,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_choose_target_group.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_choose_target_group.png)
 and LB is created,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_created.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_created.png)
 make sure the Load Balancer security group allows port 80.
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_sg_port.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_sg_port.png)
 
 copy the hostname from load balancer and try to access it via browser,
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_hostname.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_lb_hostname.png)
 
 Finally the home page is visible
-![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_web_page.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/aws/day7_web_page.png)
+
+## Day 8
+### Question 1
+You have been assigned to design a VPC architecture for a 2 tier application. The application needs to be highly available and scalable. How would you design the VPC architecture ?
+- High availability achieved with Availability zones
+- Scalability achieved with Auto scaling groups in AWS. For creating EC2 instance if you are Auto scaling group, if load increases for your application, then Auto scaling will take care of creating more EC2 instances to handle load.
+- 2 tier application where only client and server and no databases. Databases will be part of 3 tier application.
+- 
+
 
