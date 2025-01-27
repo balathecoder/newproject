@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/ece54ba6-6167-4501-a866-154a145cc102)# Terraform
+# Terraform
 
 Terraform is a open source tool that allows users to manage and provision cloud infrastructure using code. It is also known as Infrastructure as Code(IaC).
 
