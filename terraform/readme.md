@@ -8,7 +8,7 @@ HashiCorp Terraform is an infrastructure as code tool that lets you define both 
 
 ### Step 1 : Create new user in AWS using IAM
 Create vscode user in IAM.
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/1_IAM_vscode_user_with_admin_policy.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/1_IAM_vscode_user_with_admin_policy.JPG)
 
 ### Step 2 : Install AWS Toolkit in VS Code
 Go to Extensions -> Install "AWS Toolkit" extension.
@@ -18,25 +18,25 @@ Go to Extensions -> Install "AWS Toolkit" extension.
 * select vscode1 user,
 * create Access key,
 * download Access key,
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/2_VS_Code_install_AWS_toolkit.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/2_VS_Code_install_AWS_toolkit.JPG)
 
 ### Step 4 : Provide credential in VS Code
 * copy username & secret key from AWS download .csv file.
 * VS Code -> View -> Terminal -> AWS: Create Credential Profile
 * Provide profilename, access key and secret key which are copied from .csv file. As shown below vscode profile with access key & secret key
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/2_1_VS_Code_AWS_Profile.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/2_1_VS_Code_AWS_Profile.JPG)
 
 ### Step 5 : Connect to AWS
 * In VS Code -> View -> Terminal -> AWS: Connect to AWS
 * Now it's connected.
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/3_VS_Code_Connect_to_AWS.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/3_VS_Code_Connect_to_AWS.JPG)
 
 ### Step 6 : Install Terraform extension in VS Code
 
 ### Step 7 : Open new folder for terraform scripts in VS code
 
 ### Step 8 : Build a below dev environment in AWS with Terraform
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/4_Build_Dev_Env_With_Terraform.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/4_Build_Dev_Env_With_Terraform.JPG)
 
 
 Terraform files : providers.tf, variables.tf, main.tf and terraform.tfvars
@@ -67,14 +67,14 @@ provider "aws" {
 ```
 After this, run the "terraform init" as shown below, 
 
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/5_Terraform_init.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/5_Terraform_init.JPG)
 
 As we saw above, Terraform has been successfully initialized. HashiCorp version v5.84.0. Also it created .terraform.lock.hcl file and .terraform folder.
 
 ### Step 10 : Find Resources in Terraform to put resources in main.tf file and "terraform plan"
 Go to documentation and find AWS, and then click on Documentation, in left panel search vpc or resource, then choose aws_vpc as shown below,
 https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/6_Terraform_Find_Resources.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/6_Terraform_Find_Resources.JPG)
 
 To create VPC put below content in main.tf file,
 ```
@@ -146,7 +146,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly these actions if you run "terraform apply" now.
 ```
 
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/7_Terraform_plan.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/7_Terraform_plan.JPG)
 
 ### Step 11 : terraform apply command,
 
@@ -205,15 +205,15 @@ PS C:\Users\223096933\Learning\terraform\terraform_scripts>
 ```
 
 Login to AWS, in us-east-1 region, check that the VPC with name "dev" is created,
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/7_Terraform_apply.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/7_Terraform_apply.JPG)
 
 Connect to AWS from VS code, Under Resources folder in "us-east-1", check that VPC is listed,
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/7_Terraform_apply.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/7_Terraform_apply.JPG)
 
 ### Terraform state file
 Terraform state file is a json file that stores information about the resources that Terraform manages.It's a snapshot of the current state of the infrastructure. The state is stored in a local file named terraform.tfstate
 
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/9_Terraform_state_file.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/9_Terraform_state_file.JPG)
 
 ### terraform state command
 terraform state list to list the resources created by terraform that are referred in .tfstate file,
@@ -399,7 +399,7 @@ The state file is empty. No resources are represented.
 https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet
 
 Created VPC does not have any subnet,
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/11_VPC_with_no_subnets.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/11_VPC_with_no_subnets.JPG)
 
 Need to have public IP in EC2 instance so that it could be accessible from outside and for that we need to have public subnet.
 
@@ -618,7 +618,7 @@ resource "aws_vpc" "mtc_vpc" {
 }
 ```
 After subnet creation, the VPC in AWS
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/12_VPC_with_public_subnet.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/12_VPC_with_public_subnet.JPG)
 
 ### Step 13 : With Internet Gateway
 Internet gateway component horizontally scaled, redundant, and highly available VPC component that allows communication between VPC and Internet.
@@ -750,4 +750,4 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 ```
 
 AWS Toolkit in VS Code shows that Internet Gateway,
-![image](https://github.com/balathecoder/newproject/blob/master/terraform/13_AWS_Toolkit_with_IGW.png)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/13_AWS_Toolkit_with_IGW.JPG)
