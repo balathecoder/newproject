@@ -2125,6 +2125,244 @@ You can use provisioners to model specific actions on the local machine or on a 
 
 https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax
 
+windows-ssh-config.tpl,
+```
+Add-content -Path "C:/Users/223096933/.ssh/config" -value @"
+
+Host $(hostname)
+  HostName $(hostname)
+  User $(user)
+  IdentityFile $(IdentityFile)
+"@
 ```
 
+aws instance ec2 changes,
+```
+resource "aws_instance" "dev_node" {
+  instance_type = "t2.micro"
+  ami = data.aws_ami.server_ami.id
+
+  key_name = aws_key_pair.mtc_auth.id
+  vpc_security_group_ids = [aws_security_group.mtc_sg.id]
+  subnet_id = aws_subnet.mtc_public_subnet.id
+  user_data = file("userdata.tpl")
+  
+  root_block_device {
+    volume_size = 10
+  }
+
+  tags = {
+    Name = "dev-node"
+  }
+
+  provisioner "local-exec" {
+    command = templatefile("windows-ssh-config.tpl", {
+      hostname = self.public_ip,
+      user = "ubuntu",
+      identityfile = "~/.ssh/mtckey"
+    })
+    interpreter = [  "Powershell", "-Command" ]
+    #interpreter = [ "bash", "-c" ] # for linux
+  }
+}
+```
+
+for Linux, linux-ssh-config.tpl,
+```
+cat << EOF >> ~/.ssh/config
+
+Host ${hostname}
+  HostName ${hostname}
+  User ${user}
+  IdentityFile ${identityfile}
+EOF
+```
+
+after making changes in main.tf run "terraform apply -replace",
+```
+> terraform.exe apply -replace aws_instance.dev_node
+data.aws_ami.server_ami: Reading...
+aws_key_pair.mtc_auth: Refreshing state... [id=mtc_key]
+aws_vpc.mtc_vpc: Refreshing state... [id=vpc-0eb8a9117b0c5039d]
+data.aws_ami.server_ami: Read complete after 2s [id=ami-0e1bed4f06a3b463d]
+aws_internet_gateway.mtc_internet_gateway: Refreshing state... [id=igw-0c1adef9c828da48f]
+aws_route_table.mtc_public_rt: Refreshing state... [id=rtb-073d0304ea03922e7]
+aws_subnet.mtc_public_subnet: Refreshing state... [id=subnet-0aa698e51c9d1ee5d]
+aws_security_group.mtc_sg: Refreshing state... [id=sg-030b52ca3a3ea755a]
+aws_route_table_association.mtc_public_assoc: Refreshing state... [id=rtbassoc-0dd94ae59ec99d1dd]
+aws_route.default_route: Refreshing state... [id=r-rtb-073d0304ea03922e71080289494]
+aws_instance.dev_node: Refreshing state... [id=i-02ffdf26c88ba8f89]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the
+following symbols:
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # aws_instance.dev_node will be replaced, as requested
+-/+ resource "aws_instance" "dev_node" {
+      ~ arn                                  = "arn:aws:ec2:us-east-1:381491823509:instance/i-02ffdf26c88ba8f89" -> (known after 
+apply)
+      ~ associate_public_ip_address          = true -> (known after apply)
+      ~ availability_zone                    = "us-east-1a" -> (known after apply)
+      ~ cpu_core_count                       = 1 -> (known after apply)
+      ~ cpu_threads_per_core                 = 1 -> (known after apply)
+      ~ disable_api_stop                     = false -> (known after apply)
+      ~ disable_api_termination              = false -> (known after apply)
+      ~ ebs_optimized                        = false -> (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      - hibernation                          = false -> null
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      ~ id                                   = "i-02ffdf26c88ba8f89" -> (known after apply)
+      ~ instance_initiated_shutdown_behavior = "stop" -> (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      ~ instance_state                       = "running" -> (known after apply)
+      ~ ipv6_address_count                   = 0 -> (known after apply)
+      ~ ipv6_addresses                       = [] -> (known after apply)
+      ~ monitoring                           = false -> (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      ~ placement_partition_number           = 0 -> (known after apply)
+      ~ primary_network_interface_id         = "eni-06d0db12a1c76f687" -> (known after apply)
+      ~ private_dns                          = "ip-10-123-1-168.ec2.internal" -> (known after apply)
+      ~ private_ip                           = "10.123.1.168" -> (known after apply)
+      ~ public_dns                           = "ec2-52-23-251-134.compute-1.amazonaws.com" -> (known after apply)
+      ~ public_ip                            = "52.23.251.134" -> (known after apply)
+      ~ secondary_private_ips                = [] -> (known after apply)
+      ~ security_groups                      = [] -> (known after apply)
+      + spot_instance_request_id             = (known after apply)
+        tags                                 = {
+            "Name" = "dev-node"
+        }
+      ~ tenancy                              = "default" -> (known after apply)
+      + user_data_base64                     = (known after apply)
+        # (10 unchanged attributes hidden)
+
+      ~ capacity_reservation_specification (known after apply)
+      - capacity_reservation_specification {
+          - capacity_reservation_preference = "open" -> null
+        }
+
+      ~ cpu_options (known after apply)
+      - cpu_options {
+          - core_count       = 1 -> null
+          - threads_per_core = 1 -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - credit_specification {
+          - cpu_credits = "standard" -> null
+        }
+
+      ~ ebs_block_device (known after apply)
+
+      ~ enclave_options (known after apply)
+      - enclave_options {
+          - enabled = false -> null
+        }
+
+      ~ ephemeral_block_device (known after apply)
+
+      ~ instance_market_options (known after apply)
+
+      ~ maintenance_options (known after apply)
+      - maintenance_options {
+          - auto_recovery = "default" -> null
+        }
+
+      ~ metadata_options (known after apply)
+      - metadata_options {
+          - http_endpoint               = "enabled" -> null
+          - http_protocol_ipv6          = "disabled" -> null
+          - http_put_response_hop_limit = 1 -> null
+          - http_tokens                 = "optional" -> null
+          - instance_metadata_tags      = "disabled" -> null
+        }
+
+      ~ network_interface (known after apply)
+
+      ~ private_dns_name_options (known after apply)
+      - private_dns_name_options {
+          - enable_resource_name_dns_a_record    = false -> null
+          - enable_resource_name_dns_aaaa_record = false -> null
+          - hostname_type                        = "ip-name" -> null
+        }
+
+      ~ root_block_device {
+          ~ device_name           = "/dev/sda1" -> (known after apply)
+          ~ encrypted             = false -> (known after apply)
+          ~ iops                  = 100 -> (known after apply)
+          + kms_key_id            = (known after apply)
+          - tags                  = {} -> null
+          ~ tags_all              = {} -> (known after apply)
+          ~ throughput            = 0 -> (known after apply)
+          ~ volume_id             = "vol-0b5c330fd5504038c" -> (known after apply)
+          ~ volume_type           = "gp2" -> (known after apply)
+            # (2 unchanged attributes hidden)
+        }
+    }
+
+Plan: 1 to add, 0 to change, 1 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+aws_instance.dev_node: Destroying... [id=i-02ffdf26c88ba8f89]
+aws_instance.dev_node: Still destroying... [id=i-02ffdf26c88ba8f89, 10s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-02ffdf26c88ba8f89, 20s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-02ffdf26c88ba8f89, 30s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-02ffdf26c88ba8f89, 40s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-02ffdf26c88ba8f89, 50s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-02ffdf26c88ba8f89, 1m0s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-02ffdf26c88ba8f89, 1m10s elapsed]
+aws_instance.dev_node: Destruction complete after 1m14s
+aws_instance.dev_node: Creating...
+aws_instance.dev_node: Still creating... [10s elapsed]
+aws_instance.dev_node: Provisioning with 'local-exec'...
+aws_instance.dev_node (local-exec): Executing: ["Powershell" "-Command" "Add-content -Path \"C:/Users/223096933/.ssh/config\" -value @\"\r\n\r\nHost $(hostname)\r\n  HostName $(hostname)\r\n  User $(user)\r\n  IdentityFile $(identityfile)\r\n\"@"]
+aws_instance.dev_node (local-exec): user : The term 'user' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+aws_instance.dev_node (local-exec): spelling of the name, or if a path was included, verify that the path is correct and try again.
+aws_instance.dev_node (local-exec): At line:5 char:10
+aws_instance.dev_node (local-exec): +   User $(user)
+aws_instance.dev_node (local-exec): +          ~~~~
+aws_instance.dev_node (local-exec):     + CategoryInfo          : ObjectNotFound: (user:String) [], CommandNotFoundException     
+aws_instance.dev_node (local-exec):     + FullyQualifiedErrorId : CommandNotFoundException
+
+aws_instance.dev_node (local-exec): identityfile : The term 'identityfile' is not recognized as the name of a cmdlet, function, script file, or operable program.
+aws_instance.dev_node (local-exec): Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+aws_instance.dev_node (local-exec): At line:6 char:18
+aws_instance.dev_node (local-exec): +   IdentityFile $(identityfile)
+aws_instance.dev_node (local-exec): +                  ~~~~~~~~~~~~
+aws_instance.dev_node (local-exec):     + CategoryInfo          : ObjectNotFound: (identityfile:String) [], CommandNotFoundException
+aws_instance.dev_node (local-exec):     + FullyQualifiedErrorId : CommandNotFoundException
+
+aws_instance.dev_node: Creation complete after 17s [id=i-07736fa77c34dc8c4]
+
+Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
+```
+
+~/.ssh/config file added with new entry of ec2 instance,
+```
+Host 10.177.245.113
+  HostName 10.177.245.113
+  User ubuntu
+
+Host 10.177.245.113
+  HostName 10.177.245.113
+  User ubuntu
+
+Host 10.177.245.113
+  HostName 10.177.245.113
+  User ubuntu
+
+Host 3.91.91.174
+  HostName 3.91.91.174
+  User ubuntu
+  IdentityFile ~/.ssh/mtckey
 ```
