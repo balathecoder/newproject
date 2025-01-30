@@ -260,6 +260,11 @@ You have been assigned to design a VPC architecture for a 2 tier application. Th
 - High availability achieved with Availability zones
 - Scalability achieved with Auto scaling groups in AWS. For creating EC2 instance if you are Auto scaling group, if load increases for your application, then Auto scaling will take care of creating more EC2 instances to handle load.
 - 2 tier application where only client and server and no databases. Databases will be part of 3 tier application.
-- 
+- keep EC2 instances in private subnet, load balancer in public subnet within your VPC.
+Answer :
+In this scenario, I would design a VPC architecture in the following way.
+I would create 2 subnets : public and private. The public subnet would contain load balancers and be accessible from the internet. The private subnet would host the application servers.
+I would distribute the subnets across multiple Availability zones for high availability. Additionally, I would configure auto scaling groups for the application servers.
+
 
 
