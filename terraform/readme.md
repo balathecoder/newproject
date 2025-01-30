@@ -1765,17 +1765,26 @@ Add some user data before going to apply, install docker engine on the EC2 insta
 userdata.tpl below to download docker image and install it,
 ```
 #!/bin/bash
-sudo apt-get update -y &&
-sudo apt-get install -y \
-apt-transport-https \
-ca-certificates \
-curl \
-gtosg-agent \
-software-properties-common &&
-curl -fsSL https://download.docker/com/linux/ubuntu/gpg | sudo apt-key add - &&
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" &&
-sudo apt-get update -y &&
-sudo sudo apt-get install docker-ce docker-ce-cli containerd.io -y &&
+
+# Update package index and install prerequisites
+sudo apt-get update -y && sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+# Add Docker's official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+# Add Docker repository
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+# Update package index again and install Docker
+sudo apt-get update -y && \
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Add current user to docker group
 sudo usermod -aG docker ubuntu
 ```
 
@@ -2366,3 +2375,961 @@ Host 3.91.91.174
   User ubuntu
   IdentityFile ~/.ssh/mtckey
 ```
+
+Go to View -> Command Pallete -> "Remote SSH: Connect to host" -> Linux -> Choose IP address(which listed from ~/.ssh/config), It opens a new VSCode window for EC2 instance
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/20_Connect_EC2_from_VSCode_with_Provisioner.JPG)
+![image](https://github.com/balathecoder/newproject/blob/master/terraform/20_Connect_EC2_from_VSCode_with_Provisioner.JPG)
+
+
+###  Step 24 : Variables in Terraform 
+
+Instead of modifying values in multiple places, we can have variables assigned with values in single place which then can be used or referenced whereever required.
+
+https://developer.hashicorp.com/terraform/language/values/variables
+
+Variable gets declared with type and default value. 
+variables.tf
+```
+variable "host_os" {
+    type = string
+    #default = "windows"
+}
+```
+If default value is not defined, then terraform will prompt for value while running it,
+```
+> terraform.exe destroy -auto-approve
+var.host_os
+  Enter a value: windows
+
+data.aws_ami.server_ami: Reading...
+aws_key_pair.mtc_auth: Refreshing state... [id=mtc_key]
+aws_vpc.mtc_vpc: Refreshing state... [id=vpc-0eb8a9117b0c5039d]
+data.aws_ami.server_ami: Read complete after 2s [id=ami-0e1bed4f06a3b463d]
+aws_internet_gateway.mtc_internet_gateway: Refreshing state... [id=igw-0c1adef9c828da48f]
+aws_subnet.mtc_public_subnet: Refreshing state... [id=subnet-0aa698e51c9d1ee5d]
+aws_route_table.mtc_public_rt: Refreshing state... [id=rtb-073d0304ea03922e7]
+aws_security_group.mtc_sg: Refreshing state... [id=sg-030b52ca3a3ea755a]
+aws_route_table_association.mtc_public_assoc: Refreshing state... [id=rtbassoc-0dd94ae59ec99d1dd]
+aws_route.default_route: Refreshing state... [id=r-rtb-073d0304ea03922e71080289494]
+aws_instance.dev_node: Refreshing state... [id=i-0c6431864f2e6d155]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the
+following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_instance.dev_node will be destroyed
+  - resource "aws_instance" "dev_node" {
+      - ami                                  = "ami-0e1bed4f06a3b463d" -> null
+      - arn                                  = "arn:aws:ec2:us-east-1:381491823509:instance/i-0c6431864f2e6d155" -> null
+      - associate_public_ip_address          = true -> null
+      - availability_zone                    = "us-east-1a" -> null
+      - cpu_core_count                       = 1 -> null
+      - cpu_threads_per_core                 = 1 -> null
+      - disable_api_stop                     = false -> null
+      - disable_api_termination              = false -> null
+      - ebs_optimized                        = false -> null
+      - get_password_data                    = false -> null
+      - hibernation                          = false -> null
+      - id                                   = "i-0c6431864f2e6d155" -> null
+      - instance_initiated_shutdown_behavior = "stop" -> null
+      - instance_state                       = "running" -> null
+      - instance_type                        = "t2.micro" -> null
+      - ipv6_address_count                   = 0 -> null
+      - ipv6_addresses                       = [] -> null
+      - key_name                             = "mtc_key" -> null
+      - monitoring                           = false -> null
+      - placement_partition_number           = 0 -> null
+      - primary_network_interface_id         = "eni-02cb8c48d48f46369" -> null
+      - private_dns                          = "ip-10-123-1-55.ec2.internal" -> null
+      - private_ip                           = "10.123.1.55" -> null
+      - public_dns                           = "ec2-54-224-125-177.compute-1.amazonaws.com" -> null
+      - public_ip                            = "54.224.125.177" -> null
+      - secondary_private_ips                = [] -> null
+      - security_groups                      = [] -> null
+      - source_dest_check                    = true -> null
+      - subnet_id                            = "subnet-0aa698e51c9d1ee5d" -> null
+      - tags                                 = {
+          - "Name" = "dev-node"
+        } -> null
+      - tags_all                             = {
+          - "Name" = "dev-node"
+        } -> null
+      - tenancy                              = "default" -> null
+      - user_data                            = "e1f9c7d1c0106591800322b8d97fdd48db9d32f7" -> null
+      - user_data_replace_on_change          = false -> null
+      - vpc_security_group_ids               = [
+          - "sg-030b52ca3a3ea755a",
+        ] -> null
+        # (7 unchanged attributes hidden)
+
+      - capacity_reservation_specification {
+          - capacity_reservation_preference = "open" -> null
+        }
+
+      - cpu_options {
+          - core_count       = 1 -> null
+          - threads_per_core = 1 -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - credit_specification {
+          - cpu_credits = "standard" -> null
+        }
+
+      - enclave_options {
+          - enabled = false -> null
+        }
+
+      - maintenance_options {
+          - auto_recovery = "default" -> null
+        }
+
+      - metadata_options {
+          - http_endpoint               = "enabled" -> null
+          - http_protocol_ipv6          = "disabled" -> null
+          - http_put_response_hop_limit = 1 -> null
+          - http_tokens                 = "optional" -> null
+          - instance_metadata_tags      = "disabled" -> null
+        }
+
+      - private_dns_name_options {
+          - enable_resource_name_dns_a_record    = false -> null
+          - enable_resource_name_dns_aaaa_record = false -> null
+          - hostname_type                        = "ip-name" -> null
+        }
+
+      - root_block_device {
+          - delete_on_termination = true -> null
+          - device_name           = "/dev/sda1" -> null
+          - encrypted             = false -> null
+          - iops                  = 100 -> null
+          - tags                  = {} -> null
+          - tags_all              = {} -> null
+          - throughput            = 0 -> null
+          - volume_id             = "vol-048340f5c8104de6f" -> null
+          - volume_size           = 10 -> null
+          - volume_type           = "gp2" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_internet_gateway.mtc_internet_gateway will be destroyed
+  - resource "aws_internet_gateway" "mtc_internet_gateway" {
+      - arn      = "arn:aws:ec2:us-east-1:381491823509:internet-gateway/igw-0c1adef9c828da48f" -> null
+      - id       = "igw-0c1adef9c828da48f" -> null
+      - owner_id = "381491823509" -> null
+      - tags     = {
+          - "Name" = "dev-igw"
+        } -> null
+      - tags_all = {
+          - "Name" = "dev-igw"
+        } -> null
+      - vpc_id   = "vpc-0eb8a9117b0c5039d" -> null
+    }
+
+  # aws_key_pair.mtc_auth will be destroyed
+  - resource "aws_key_pair" "mtc_auth" {
+      - arn             = "arn:aws:ec2:us-east-1:381491823509:key-pair/mtc_key" -> null
+      - fingerprint     = "3qj+4KdntUvBgREMGwkkPszlRilSLQlkFZw53zZ6lCA=" -> null
+      - id              = "mtc_key" -> null
+      - key_name        = "mtc_key" -> null
+      - key_pair_id     = "key-0e593c4cdfe5f9bbb" -> null
+      - key_type        = "ed25519" -> null
+      - public_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID3pcMs/WI9zcA5Vo1v0D/h7h+kTyABWLmcHQRHLWidG hcad\\223096933@HC-2V0N0V3" -> null
+      - tags            = {} -> null
+      - tags_all        = {} -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # aws_route.default_route will be destroyed
+  - resource "aws_route" "default_route" {
+      - destination_cidr_block      = "0.0.0.0/0" -> null
+      - gateway_id                  = "igw-0c1adef9c828da48f" -> null
+      - id                          = "r-rtb-073d0304ea03922e71080289494" -> null
+      - origin                      = "CreateRoute" -> null
+      - route_table_id              = "rtb-073d0304ea03922e7" -> null
+      - state                       = "active" -> null
+        # (13 unchanged attributes hidden)
+    }
+
+  # aws_route_table.mtc_public_rt will be destroyed
+  - resource "aws_route_table" "mtc_public_rt" {
+      - arn              = "arn:aws:ec2:us-east-1:381491823509:route-table/rtb-073d0304ea03922e7" -> null
+      - id               = "rtb-073d0304ea03922e7" -> null
+      - owner_id         = "381491823509" -> null
+      - propagating_vgws = [] -> null
+      - route            = [
+          - {
+              - cidr_block                 = "0.0.0.0/0"
+              - gateway_id                 = "igw-0c1adef9c828da48f"
+                # (11 unchanged attributes hidden)
+            },
+        ] -> null
+      - tags             = {
+          - "Name" = "dev_public_rt"
+        } -> null
+      - tags_all         = {
+          - "Name" = "dev_public_rt"
+        } -> null
+      - vpc_id           = "vpc-0eb8a9117b0c5039d" -> null
+    }
+
+  # aws_route_table_association.mtc_public_assoc will be destroyed
+  - resource "aws_route_table_association" "mtc_public_assoc" {
+      - id             = "rtbassoc-0dd94ae59ec99d1dd" -> null
+      - route_table_id = "rtb-073d0304ea03922e7" -> null
+      - subnet_id      = "subnet-0aa698e51c9d1ee5d" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # aws_security_group.mtc_sg will be destroyed
+  - resource "aws_security_group" "mtc_sg" {
+      - arn                    = "arn:aws:ec2:us-east-1:381491823509:security-group/sg-030b52ca3a3ea755a" -> null
+      - description            = "dev security group" -> null
+      - egress                 = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - from_port        = 0
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ] -> null
+      - id                     = "sg-030b52ca3a3ea755a" -> null
+      - ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - from_port        = 0
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ] -> null
+      - name                   = "dev_sg" -> null
+      - owner_id               = "381491823509" -> null
+      - revoke_rules_on_delete = false -> null
+      - tags                   = {} -> null
+      - tags_all               = {} -> null
+      - vpc_id                 = "vpc-0eb8a9117b0c5039d" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+  # aws_subnet.mtc_public_subnet will be destroyed
+  - resource "aws_subnet" "mtc_public_subnet" {
+      - arn                                            = "arn:aws:ec2:us-east-1:381491823509:subnet/subnet-0aa698e51c9d1ee5d" -> 
+null
+      - assign_ipv6_address_on_creation                = false -> null
+      - availability_zone                              = "us-east-1a" -> null
+      - availability_zone_id                           = "use1-az6" -> null
+      - cidr_block                                     = "10.123.1.0/24" -> null
+      - enable_dns64                                   = false -> null
+      - enable_lni_at_device_index                     = 0 -> null
+      - enable_resource_name_dns_a_record_on_launch    = false -> null
+      - enable_resource_name_dns_aaaa_record_on_launch = false -> null
+      - id                                             = "subnet-0aa698e51c9d1ee5d" -> null
+      - ipv6_native                                    = false -> null
+      - map_customer_owned_ip_on_launch                = false -> null
+      - map_public_ip_on_launch                        = true -> null
+      - owner_id                                       = "381491823509" -> null
+      - private_dns_hostname_type_on_launch            = "ip-name" -> null
+      - tags                                           = {
+          - "Name" = "dev-public"
+        } -> null
+      - tags_all                                       = {
+          - "Name" = "dev-public"
+        } -> null
+      - vpc_id                                         = "vpc-0eb8a9117b0c5039d" -> null
+        # (4 unchanged attributes hidden)
+    }
+
+  # aws_vpc.mtc_vpc will be destroyed
+  - resource "aws_vpc" "mtc_vpc" {
+      - arn                                  = "arn:aws:ec2:us-east-1:381491823509:vpc/vpc-0eb8a9117b0c5039d" -> null
+      - assign_generated_ipv6_cidr_block     = false -> null
+      - cidr_block                           = "10.123.0.0/16" -> null
+      - default_network_acl_id               = "acl-0723879988b77230c" -> null
+      - default_route_table_id               = "rtb-0755e7875faa4264a" -> null
+      - default_security_group_id            = "sg-0ee821ec539c30e9a" -> null
+      - dhcp_options_id                      = "dopt-0a4cbdf7b65ab37ae" -> null
+      - enable_dns_hostnames                 = true -> null
+      - enable_dns_support                   = true -> null
+      - enable_network_address_usage_metrics = false -> null
+      - id                                   = "vpc-0eb8a9117b0c5039d" -> null
+      - instance_tenancy                     = "default" -> null
+      - ipv6_netmask_length                  = 0 -> null
+      - main_route_table_id                  = "rtb-0755e7875faa4264a" -> null
+      - owner_id                             = "381491823509" -> null
+      - tags                                 = {
+          - "Name" = "dev"
+        } -> null
+      - tags_all                             = {
+          - "Name" = "dev"
+        } -> null
+        # (4 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 0 to change, 9 to destroy.
+aws_route_table_association.mtc_public_assoc: Destroying... [id=rtbassoc-0dd94ae59ec99d1dd]
+aws_route.default_route: Destroying... [id=r-rtb-073d0304ea03922e71080289494]
+aws_instance.dev_node: Destroying... [id=i-0c6431864f2e6d155]
+aws_route_table_association.mtc_public_assoc: Destruction complete after 2s
+aws_route.default_route: Destruction complete after 3s
+aws_internet_gateway.mtc_internet_gateway: Destroying... [id=igw-0c1adef9c828da48f]
+aws_route_table.mtc_public_rt: Destroying... [id=rtb-073d0304ea03922e7]
+aws_route_table.mtc_public_rt: Destruction complete after 2s
+aws_instance.dev_node: Still destroying... [id=i-0c6431864f2e6d155, 10s elapsed]
+aws_internet_gateway.mtc_internet_gateway: Still destroying... [id=igw-0c1adef9c828da48f, 10s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-0c6431864f2e6d155, 20s elapsed]
+aws_internet_gateway.mtc_internet_gateway: Still destroying... [id=igw-0c1adef9c828da48f, 20s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-0c6431864f2e6d155, 30s elapsed]
+aws_internet_gateway.mtc_internet_gateway: Still destroying... [id=igw-0c1adef9c828da48f, 30s elapsed]
+aws_instance.dev_node: Still destroying... [id=i-0c6431864f2e6d155, 40s elapsed]
+aws_internet_gateway.mtc_internet_gateway: Still destroying... [id=igw-0c1adef9c828da48f, 40s elapsed]
+aws_internet_gateway.mtc_internet_gateway: Destruction complete after 41s
+aws_instance.dev_node: Destruction complete after 48s
+aws_key_pair.mtc_auth: Destroying... [id=mtc_key]
+aws_security_group.mtc_sg: Destroying... [id=sg-030b52ca3a3ea755a]
+aws_subnet.mtc_public_subnet: Destroying... [id=subnet-0aa698e51c9d1ee5d]
+aws_key_pair.mtc_auth: Destruction complete after 0s
+aws_security_group.mtc_sg: Destruction complete after 1s
+aws_subnet.mtc_public_subnet: Destruction complete after 1s
+aws_vpc.mtc_vpc: Destroying... [id=vpc-0eb8a9117b0c5039d]
+aws_vpc.mtc_vpc: Destruction complete after 1s
+
+Destroy complete! Resources: 9 destroyed.
+```
+
+### Step 25 : Variable Precedence
+
+Terraform loads variables in the following order,
+* Environment variables,
+* terraform.tfvars file if present,
+* terraform.tfvars.json file if present,
+* Any *.auto.tfvars or *.auto.tfvars.json files, processed in lexical order of their filenames.
+* Any -var or -var-file options on the command line, in the order they are provided.
+
+Let say if host_os variable defined in Environment variable, terraform.tfvars.json, then it will read from both and will accept the value from terraform.tfvars.json file.
+
+We can also check variable values in terraform console
+```
+PS C:\Users\223096933\Learning\terraform\terraform_scripts> terraform.exe console     
+> var.host_os
+(known after apply)
+> exit
+PS C:\Users\223096933\Learning\terraform\terraform_scripts> 
+```
+After applying default value for host_os in variables.tf file,
+```
+PS C:\Users\223096933\Learning\terraform\terraform_scripts> terraform.exe console
+> var.host_os
+"windows"
+```
+
+### Step 26 : terraform.tfvars
+
+.tfvars is used to set lot of variables to specify their values in variable definition file and then specify that file on the command line with -var-file.
+
+Linux or Mac,
+```
+> terraform apply -var-file="testing.tfvars"
+```
+
+Windows,
+```
+> terraform apply -var-file='testing.tfvars'
+```
+
+Terraform automatically loads all variables from terraform.tfvars or terraform.tfvars.json or any file names ending with .auto.tfvars or auto.tfvars.json if present,
+
+terraform.tfvars
+```
+host_os = "linux"
+```
+check values from terraform console(variables.tf it is set as "windows" and in terraform.tfvars it is set as linux and latter takes precedence),
+```
+> terraform.exe console
+> var.host_os
+"linux"
+>
+```
+
+And if you need overwrite host_os variable value any file at anywhere, then you can use command line option as shown below
+```
+> terraform.exe console -var="host_os=unix"
+> var.host_os
+"unix"
+>
+```
+
+One more dev.tfvars and still terraform.tfvars takes precedence
+```
+host_os="osx"
+```
+from console,
+```
+> terraform.exe console
+> var.host_os
+"linux"
+>
+```
+now passing .tfvars in command line option and that takes precedence that terraform.tfvars,
+```
+> terraform.exe console -var-file="dev.tfvars"
+> var.host_os
+"osx"
+>
+```
+
+### Step 27 : Conditionals
+A conditional expression uses the value of a boolean expression to select one of the two values.
+https://developer.hashicorp.com/terraform/language/expressions/conditionals
+
+now choose between powershell and bash based on host_os value,
+```
+PS C:\Users\223096933\Learning\terraform\terraform_scripts> terraform.exe console -var="host_os=windows"
+> var.host_os
+"windows"
+> var.host_os == "windows" ? "powershell" : "bash"
+"powershell"
+> var.host_os == "linux" ? "bash" : "powershell"
+"powershell"
+> var.host_os == "windows" ? ["Powershell", "-Command"] : ["bash", "-c"]
+[
+  "Powershell",
+  "-Command",
+]
+>
+```
+
+Now the last condition can be used in EC2 instance resource in main.tf file and before that keep value as correct OS in terraform.tfvars file,
+```
+resource "aws_instance" "dev_node" {
+  instance_type = "t2.micro"
+  ami = data.aws_ami.server_ami.id
+
+  key_name = aws_key_pair.mtc_auth.id
+  vpc_security_group_ids = [aws_security_group.mtc_sg.id]
+  subnet_id = aws_subnet.mtc_public_subnet.id
+  user_data = file("userdata.tpl")
+  
+  root_block_device {
+    volume_size = 10
+  }
+
+  tags = {
+    Name = "dev-node"
+  }
+
+  provisioner "local-exec" {
+    command = templatefile("${var.host_os}-ssh-config.tpl", {
+      hostname = self.public_ip,
+      user = "ubuntu",
+      identityfile = "~/.ssh/mtckey"
+    })
+    interpreter = var.host_os == "windows" ? ["Powershell", "-Command"] : ["bash", "-c"]
+    #interpreter = [ "bash", "-c" ] # for linux
+  }
+}
+```
+
+now run "terraform plan"
+```
+> terraform.exe plan
+data.aws_ami.server_ami: Reading...
+data.aws_ami.server_ami: Read complete after 2s [id=ami-0e1bed4f06a3b463d]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the
+following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_instance.dev_node will be created
+  + resource "aws_instance" "dev_node" {
+      + ami                                  = "ami-0e1bed4f06a3b463d"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = (known after apply)
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "t2.micro"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = (known after apply)
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = (known after apply)
+      + tags                                 = {
+          + "Name" = "dev-node"
+        }
+      + tags_all                             = {
+          + "Name" = "dev-node"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = "e1f9c7d1c0106591800322b8d97fdd48db9d32f7"
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = (known after apply)
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 10
+          + volume_type           = (known after apply)
+        }
+    }
+
+  # aws_internet_gateway.mtc_internet_gateway will be created
+  + resource "aws_internet_gateway" "mtc_internet_gateway" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "dev-igw"
+        }
+      + tags_all = {
+          + "Name" = "dev-igw"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # aws_key_pair.mtc_auth will be created
+  + resource "aws_key_pair" "mtc_auth" {
+      + arn             = (known after apply)
+      + fingerprint     = (known after apply)
+      + id              = (known after apply)
+      + key_name        = "mtc_key"
+      + key_name_prefix = (known after apply)
+      + key_pair_id     = (known after apply)
+      + key_type        = (known after apply)
+      + public_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID3pcMs/WI9zcA5Vo1v0D/h7h+kTyABWLmcHQRHLWidG hcad\\223096933@HC-2V0N0V3"
+      + tags_all        = (known after apply)
+    }
+
+  # aws_route.default_route will be created
+  + resource "aws_route" "default_route" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + gateway_id             = (known after apply)
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+    }
+
+  # aws_route_table.mtc_public_rt will be created
+  + resource "aws_route_table" "mtc_public_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "dev_public_rt"
+        }
+      + tags_all         = {
+          + "Name" = "dev_public_rt"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # aws_route_table_association.mtc_public_assoc will be created
+  + resource "aws_route_table_association" "mtc_public_assoc" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # aws_security_group.mtc_sg will be created
+  + resource "aws_security_group" "mtc_sg" {
+      + arn                    = (known after apply)
+      + description            = "dev security group"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + name                   = "dev_sg"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags_all               = (known after apply)
+      + vpc_id                 = (known after apply)
+    }
+
+  # aws_subnet.mtc_public_subnet will be created
+  + resource "aws_subnet" "mtc_public_subnet" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.123.1.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = true
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name" = "dev-public"
+        }
+      + tags_all                                       = {
+          + "Name" = "dev-public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # aws_vpc.mtc_vpc will be created
+  + resource "aws_vpc" "mtc_vpc" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.123.0.0/16"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = true
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "dev"
+        }
+      + tags_all                             = {
+          + "Name" = "dev"
+        }
+    }
+
+Plan: 9 to add, 0 to change, 0 to destroy.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+
+Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly these actions if you run    
+"terraform apply" now.
+```
+
+Now run "terraform apply" and go to VS Code-> View -> Command Pallete -> "Remote SSH: Connect to host" -> choose new EC2 instance IP -> Linux -> Continue 
+The VS Code for your new EC2 instance is opened.
+
+### Step 28 : Outputs
+
+From terraform console, you can print the EC2 instance IP address,
+```
+PS C:\Users\223096933\Learning\terraform\terraform_scripts> terraform.exe console     
+> aws_instance.dev_node.public_ip
+"3.89.67.147"
+>
+```
+
+All the variables that are listed can be printed in console,
+```
+> terraform.exe state show aws_instance.dev_node
+# aws_instance.dev_node:
+resource "aws_instance" "dev_node" {
+    ami                                  = "ami-0e1bed4f06a3b463d"
+    arn                                  = "arn:aws:ec2:us-east-1:381491823509:instance/i-0b8cb88b1394b5d38"
+    associate_public_ip_address          = true
+    availability_zone                    = "us-east-1a"
+    cpu_core_count                       = 1
+    cpu_threads_per_core                 = 1
+    disable_api_stop                     = false
+    disable_api_termination              = false
+    ebs_optimized                        = false
+    get_password_data                    = false
+    hibernation                          = false
+    host_id                              = null
+    iam_instance_profile                 = null
+    id                                   = "i-0b8cb88b1394b5d38"
+    instance_initiated_shutdown_behavior = "stop"
+    instance_lifecycle                   = null
+    instance_state                       = "running"
+    instance_type                        = "t2.micro"
+    ipv6_address_count                   = 0
+    ipv6_addresses                       = []
+    key_name                             = "mtc_key"
+    monitoring                           = false
+    outpost_arn                          = null
+    password_data                        = null
+    placement_group                      = null
+    placement_partition_number           = 0
+    primary_network_interface_id         = "eni-08f6bbb07b3b2b735"
+    private_dns                          = "ip-10-123-1-78.ec2.internal"
+    private_ip                           = "10.123.1.78"
+    public_dns                           = "ec2-3-89-67-147.compute-1.amazonaws.com"
+    public_ip                            = "3.89.67.147"
+    secondary_private_ips                = []
+    security_groups                      = []
+    source_dest_check                    = true
+    spot_instance_request_id             = null
+    subnet_id                            = "subnet-0be9d2d4133debf9e"
+    tags                                 = {
+        "Name" = "dev-node"
+    }
+    tags_all                             = {
+        "Name" = "dev-node"
+    }
+    tenancy                              = "default"
+    user_data                            = "e1f9c7d1c0106591800322b8d97fdd48db9d32f7"
+    user_data_replace_on_change          = false
+    vpc_security_group_ids               = [
+        "sg-08cb0d9d4c98bfde4",
+    ]
+
+    capacity_reservation_specification {
+        capacity_reservation_preference = "open"
+    }
+
+    cpu_options {
+        amd_sev_snp      = null
+        core_count       = 1
+        threads_per_core = 1
+    }
+
+    credit_specification {
+        cpu_credits = "standard"
+    }
+
+    enclave_options {
+        enabled = false
+    }
+
+    maintenance_options {
+        auto_recovery = "default"
+    }
+
+    metadata_options {
+        http_endpoint               = "enabled"
+        http_protocol_ipv6          = "disabled"
+        http_put_response_hop_limit = 1
+        http_tokens                 = "optional"
+        instance_metadata_tags      = "disabled"
+    }
+
+    private_dns_name_options {
+        enable_resource_name_dns_a_record    = false
+        enable_resource_name_dns_aaaa_record = false
+        hostname_type                        = "ip-name"
+    }
+
+    root_block_device {
+        delete_on_termination = true
+        device_name           = "/dev/sda1"
+        encrypted             = false
+        iops                  = 100
+        kms_key_id            = null
+        tags_all              = {}
+        throughput            = 0
+        volume_id             = "vol-0f69747a13647d270"
+        volume_size           = 10
+        volume_type           = "gp2"
+    }
+}
+```
+
+create outputs.tf as,
+```
+output "dev_ip" {
+    value = aws_instance.dev_node.public_ip
+}
+```
+
+Now we need not to redeploy the all resources, just do refresh as,
+```
+> terraform.exe apply -refresh-only
+data.aws_ami.server_ami: Reading...
+aws_key_pair.mtc_auth: Refreshing state... [id=mtc_key]
+aws_vpc.mtc_vpc: Refreshing state... [id=vpc-0e5d3bc3f328e6605]
+data.aws_ami.server_ami: Read complete after 3s [id=ami-0e1bed4f06a3b463d]
+aws_internet_gateway.mtc_internet_gateway: Refreshing state... [id=igw-0f6f49950c58f107a]
+aws_route_table.mtc_public_rt: Refreshing state... [id=rtb-052f16649b29e089b]
+aws_subnet.mtc_public_subnet: Refreshing state... [id=subnet-0be9d2d4133debf9e]
+aws_security_group.mtc_sg: Refreshing state... [id=sg-08cb0d9d4c98bfde4]
+aws_route.default_route: Refreshing state... [id=r-rtb-052f16649b29e089b1080289494]
+aws_route_table_association.mtc_public_assoc: Refreshing state... [id=rtbassoc-00d3f7b46dbd6b685]
+aws_instance.dev_node: Refreshing state... [id=i-0b8cb88b1394b5d38]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the last "terraform apply" which may have affected this 
+plan:
+
+  # aws_instance.dev_node has changed
+  ~ resource "aws_instance" "dev_node" {
+        id                                   = "i-0b8cb88b1394b5d38"
+        tags                                 = {
+            "Name" = "dev-node"
+        }
+        # (40 unchanged attributes hidden)
+
+      ~ root_block_device {
+          + tags                  = {}
+            # (10 unchanged attributes hidden)
+        }
+
+        # (7 unchanged blocks hidden)
+    }
+
+  # aws_key_pair.mtc_auth has changed
+  ~ resource "aws_key_pair" "mtc_auth" {
+        id              = "mtc_key"
+      + tags            = {}
+        # (8 unchanged attributes hidden)
+    }
+
+  # aws_route_table.mtc_public_rt has changed
+  ~ resource "aws_route_table" "mtc_public_rt" {
+        id               = "rtb-052f16649b29e089b"
+      ~ route            = [
+          + {
+              + cidr_block                 = "0.0.0.0/0"
+              + gateway_id                 = "igw-0f6f49950c58f107a"
+                # (11 unchanged attributes hidden)
+            },
+        ]
+        tags             = {
+            "Name" = "dev_public_rt"
+        }
+        # (5 unchanged attributes hidden)
+    }
+
+  # aws_security_group.mtc_sg has changed
+  ~ resource "aws_security_group" "mtc_sg" {
+        id                     = "sg-08cb0d9d4c98bfde4"
+        name                   = "dev_sg"
+      + tags                   = {}
+        # (9 unchanged attributes hidden)
+    }
+
+
+This is a refresh-only plan, so Terraform will not take any actions to undo these. If you were expecting these changes then you  
+can apply this plan to record the updated values in the Terraform state without changing any remote objects.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+
+Changes to Outputs:
+  + dev_ip = "3.89.67.147"
+
+You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.        
+
+Would you like to update the Terraform state to reflect these detected changes?
+  Terraform will write these changes to the state without modifying any real infrastructure.
+  There is no undo. Only 'yes' will be accepted to confirm.
+
+  Enter a value: yes
+
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+dev_ip = "3.89.67.147"
+```
+The above output has dev_ip variable with EC2 instance IP address.
+
+Now run terraform output,
+```
+> terraform.exe output      
+dev_ip = "3.89.67.147"
+```
+
+All these you can notice in terraform.tfstate file.
