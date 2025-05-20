@@ -86,3 +86,26 @@ if you Content Distribution Network, then your static website content like html,
 Stateful - storing the user session/state who is interacting with application.
 Stateless - Not storing.
 
+## Non Functional Requirements
+For NFR, the key requirements are,
+* Performance(Low latency)
+* Availability (System should be highly availability with 99.9999% availability)
+* Scalability (The system should be highly scalable. During peak load, the system should be able to scale autotically to handle such loads)
+* Reliability (How consistent system performance on a regular basis including fault tolerant. In case of ecommerce, when system fails during payment, it should refund the money for failure in placing the order)
+
+NFR defines how well the system performs when the system grows and matching the user expectation. Let say if search results taking lot of time to load, then it creates negative impact to user and they might go away from our system. One more scenario, when system load increases during Olympic time, the number of users for Twitter will increase, so system should be able to handle such high loads.
+
+## Capacity Estimations
+1. Determine no of servers and databases
+- Daily Active Users
+- Monthly Active Users
+- Throughput
+- Bandwidth
+- Storage
+let say if requirement is 10M requests/hour and our system handles 1M request/hour, then we should have those many instances to handle the load.
+2. Cost Management
+We should make sure the system provisioned with required number of servers to manage cost effectively.
+3. Decide type and specifications of all hardware
+Let say 10M queries /Hour, if SQL handles 50k queries, NoSQL handles 1M queries, then we should go with NoSQL.
+
+
