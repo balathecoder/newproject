@@ -20,6 +20,8 @@ that means number of read is much higher than the write operation.
 If user base or records continue to grow, you can simply add more instance to improve performance.
 ![image](https://github.com/user-attachments/assets/a3d5d52f-9611-426d-b67f-0342bf301d2d)
 
+The database replication will be used mainly for High availability and load balancing. While sharding is used for horizontal scaling when data volume grows what a single server cant handle or to handle massive amount of data and traffic by using multiple servers.
+
 ## 2. Horizontal vs Vertical Scaling
 ![image](https://github.com/user-attachments/assets/88bf9ac2-f105-4c02-a657-540fc8ee085b)
 The users access the system using the web browser or mobile app. Here the website, database and cache everything runs under one system. When system becomes more popular, you will get more users coming to your system. In that case
@@ -82,6 +84,26 @@ if you Content Distribution Network, then your static website content like html,
 
 ![image](https://github.com/user-attachments/assets/eddf8aa1-3514-4f6c-b20a-9b657ef00c09)
 
+### Database Sharding
+Database is a technique involves dividing a large database into smaller, more manageable parts called shards. Each shard is stored on a separate database server or node, allowing for horizontal scalability and improved performance. This is mainly used for write efficiency.
+ 
+In essence, sharding enables the database to handle large amount of data and traffic by distributing the load and resources across multiple servers for improved performance.
+
+Sharding is to improve write efficiency on database. Based on id or geographical location, gender, creator the sharding can be applied.
+https://www.geeksforgeeks.org/difference-between-database-sharding-and-replication/
+#### When to use Sharding
+* Large Datasets : When your database grows significantly and a single server can no longer handle the load.
+* Horizontal scaling : To scale by adding more servers or nodes as data grows.
+* High write load : When you have lot of write operations and want to distribute the load across multiple servers.
+* Example : Ecommerce system with extensive product catalogs, social media platforms, or multi tenant applications.
+
+#### When to use Replication
+* High Availability : To ensure continuous access to data even if a server fails.
+* Fault tolerance : To protect against server failures by maintaing multiple copies of data.
+* Read scalability : To distribute read traffic and reduce load on the primary server.
+* Data durability : To ensure data is not lost when server failure.
+* Example : Web application, online banking system, or other application where data integrity and availability are critical.
+  
 ## Stateful vs Stateless Architecture
 Stateful - storing the user session/state who is interacting with application.
 Stateless - Not storing.
