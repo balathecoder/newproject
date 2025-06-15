@@ -131,3 +131,106 @@ We should make sure the system provisioned with required number of servers to ma
 Let say 10M queries /Hour, if SQL handles 50k queries, NoSQL handles 1M queries, then we should go with NoSQL.
 
 
+## API Performance
+### 1. Payload compression
+Network latency will be high if payload data that we are sending in large so we can send it compressed data using gzip middleware.
+```
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+import gzip
+
+app = FastAPI()
+
+@app.post("/compressed")
+async def handle_compressed_request(request: Request):
+    if "Content-Encoding" in request.headers and request.headers['Content-Encoding'] == "gzip":
+        try:
+            decompressed_data = gzip.decompress(await request.body())
+            payload_size = len(decompressed_data)
+
+            print('decompressed data :',decompressed_data.decode('utf-8'))
+            print('payload size : ', payload_size, "bytes")
+            return JSONResponse(content={"message":"Success!"})
+        except Exception as e:
+            return JSONResponse(content={"message":f"Error : {str(e)}"})
+    else:
+        return JSONResponse(content={"message":"Content Encoding must be gzip"})
+```
+Run the server,
+```
+$ uvicorn payload_compression:app --reload
+```
+For quick testing, create a simple json and compress it with gzip,
+```
+$ echo '{"key":"value"}' >data.json
+$ gzip data.json
+```
+
+Run the curl command,
+```
+$ curl -X POST -H "Content-Type: application/json" -H "Content-Encoding: gzip" --data-binary "@data.json.gz" http://127.0.0.1:8000/compressed
+{"message":"Success!"}
+```
+### Pagination
+Paginatino with fastapi
+```
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+from fastapi_pagination import Page, add_pagination, paginate, Params
+app = FastAPI()
+print("app created")
+add_pagination(app)
+print("pagination added")
+
+class UserOut(BaseModel):
+    name: str = Field(..., example="Steve")
+    surname: str = Field(..., example="Rogers")
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Steve",
+                "surname": "Rogers"
+            }
+        }
+
+users = [
+    UserOut(name="Steve", surname="Rogers"),
+    UserOut(name="Tony", surname="Stark"),
+    UserOut(name="Natasha", surname="Romanoff"),
+    UserOut(name="Bruce", surname="Banner"),
+    UserOut(name="Clint", surname="Barton"),
+    UserOut(name="Thor", surname="Odinson"),
+    UserOut(name="Wanda", surname="Maximoff"),
+    UserOut(name="Vision", surname="Vision"),
+    UserOut(name="Sam", surname="Wilson"),
+    UserOut(name="Bucky", surname="Barnes")
+]
+print('start /users')
+@app.get("/users", response_model=Page[UserOut])
+async def get_users(params: Params = Params()):
+    return paginate(users, params)
+```
+
+Note : orm_mode in FastAPI, when used with Pydantic models, enables seamless integration with Object-Relational Mappers (ORMs) like SQLAlchemy. This setting allows Pydantic models to accept ORM objects directly, instead of just dictionaries.
+from pydantic import BaseModel
+class IPSchema(BaseModel):
+   ip: str
+   class Config:
+       orm_mode: True
+       
+from sqlalchemy import Column, Integer, String
+from database import Base
+class IPModel(Base)
+### Caching
+
+### Connection Pooling
+Connection pooling primarily enhances the responses of your FastAPI application by managing pool of database connections that can be reused among multiple user requests.
+The max_connections to a mysql database is 150 + 1 for administrator. It depends on resources such as RAM, file handles and network sockets. More connections generally requires more memory usage and that will degrade performance.
+
+
+Without using ORM if we want to use database connection in fastapi application, asyncpg can be used.
+
+https://www.sheshbabu.com/posts/fastapi-without-orm-getting-started-with-asyncpg/
+https://www.youtube.com/watch?v=gaOFk3bqM_4
