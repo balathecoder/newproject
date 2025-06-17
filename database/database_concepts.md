@@ -8,3 +8,4 @@ simplifies database design.
 ## Denormalization
 for performance imporovement instead of joining different tables to get records, still can go with single table.
 
+https://www.youtube.com/watch?v=9hfjC-BpY20
